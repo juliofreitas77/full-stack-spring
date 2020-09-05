@@ -81,9 +81,13 @@ public class Categoria implements Serializable {
 		return true;
 	}
 
-	
-	
-	
-	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
 
 }
