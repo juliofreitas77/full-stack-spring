@@ -75,7 +75,6 @@ public class ModconceitualApplication implements CommandLineRunner {
 		Categoria cat5 = new Categoria(null, "Jardinagem");
 		Categoria cat6 = new Categoria(null, "Descoração");
 		Categoria cat7 = new Categoria(null, "Perfumaria");
-		
 
 		Produto p1 = new Produto(null, "Computador", 200.00);
 		Produto p2 = new Produto(null, "Impressora", 800.00);
