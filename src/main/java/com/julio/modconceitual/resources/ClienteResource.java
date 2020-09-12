@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.julio.modconceitual.domain.Cliente;
 import com.julio.modconceitual.dto.ClienteDTO;
+import com.julio.modconceitual.dto.ClienteNewDTO;
 import com.julio.modconceitual.services.ClienteService;
 
 /**
@@ -43,7 +44,7 @@ public class ClienteResource {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Void> insert(@Valid @RequestBody ClienteDTO objDTO) {
+	public ResponseEntity<Void> insert(@Valid @RequestBody ClienteNewDTO objDTO) {
 		Cliente obj = service.fromDTO(objDTO);
 		obj = service.insert(obj);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
