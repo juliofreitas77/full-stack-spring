@@ -3,6 +3,7 @@
  */
 package com.julio.modconceitual.resources;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.julio.modconceitual.domain.Cliente;
 import com.julio.modconceitual.dto.ClienteDTO;
@@ -38,6 +40,14 @@ public class ClienteResource {
 	public ResponseEntity<?> find(@PathVariable Integer id) {
 		Cliente categoria = service.find(id);
 		return ResponseEntity.ok().body(categoria);
+	}
+	
+	@RequestMapping(method = RequestMethod.POST)
+	public ResponseEntity<Void> insert(@Valid @RequestBody ClienteDTO objDTO) {
+		Cliente obj = service.fromDTO(objDTO);
+		obj = service.insert(obj);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
+		return ResponseEntity.created(uri).build();
 	}
 	
 	
