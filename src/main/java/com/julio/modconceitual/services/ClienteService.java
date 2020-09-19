@@ -15,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.julio.modconceitual.domain.Cidade;
 import com.julio.modconceitual.domain.Cliente;
 import com.julio.modconceitual.domain.Endereco;
+import com.julio.modconceitual.domain.enums.Perfil;
 import com.julio.modconceitual.domain.enums.TipoCliente;
 import com.julio.modconceitual.dto.ClienteDTO;
 import com.julio.modconceitual.dto.ClienteNewDTO;
 import com.julio.modconceitual.repositories.ClienteRepository;
 import com.julio.modconceitual.repositories.EnderecoRepository;
+import com.julio.modconceitual.security.UserSS;
+import com.julio.modconceitual.services.exceptions.AuthorizationException;
 import com.julio.modconceitual.services.exceptions.DataIntegrityException;
 import com.julio.modconceitual.services.exceptions.ObjectNotFoundException;
 
@@ -36,6 +39,12 @@ public class ClienteService {
 	private BCryptPasswordEncoder pe;
 
 	public Cliente find(Integer id) {
+		
+		UserSS user = UserService.authenticated();
+		if (user==null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso negado");
+		}
+		
 		Optional<Cliente> obj = repository.findById(id);
 		return obj.orElseThrow(() ->  new ObjectNotFoundException(
 				"Objeto Nao encontrado! Id:" + id + ", Tipo: " + Cliente.class.getName()));
