@@ -4,9 +4,13 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.julio.modconceitual.domain.Cliente;
 import com.julio.modconceitual.domain.ItemPedido;
 import com.julio.modconceitual.domain.PagamentoComBoleto;
 import com.julio.modconceitual.domain.Pedido;
@@ -14,6 +18,8 @@ import com.julio.modconceitual.domain.enums.EstadoPagamento;
 import com.julio.modconceitual.repositories.ItemPedidoRepository;
 import com.julio.modconceitual.repositories.PagamentoRepository;
 import com.julio.modconceitual.repositories.PedidoRepository;
+import com.julio.modconceitual.security.UserSS;
+import com.julio.modconceitual.services.exceptions.AuthorizationException;
 import com.julio.modconceitual.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -33,10 +39,10 @@ public class PedidoService {
 
 	@Autowired
 	private ProdutoService produtoService;
-	
+
 	@Autowired
 	private ClienteService clienteService;
-	
+
 	@Autowired
 	private EmailService emailService;
 
@@ -61,7 +67,7 @@ public class PedidoService {
 		pagamentoRepository.save(obj.getPagamento());
 		for (ItemPedido ip : obj.getItens()) {
 			ip.setDesconto(0.0);
-			//ip.setPreco(produtoService.find(ip.getProduto().getId()).getPreco());
+			// ip.setPreco(produtoService.find(ip.getProduto().getId()).getPreco());
 			ip.setProduto(produtoService.find(ip.getProduto().getId()));
 			ip.setPreco(ip.getProduto().getPreco());
 			ip.setPedido(obj);
@@ -69,5 +75,15 @@ public class PedidoService {
 		itemPedidoRepository.saveAll(obj.getItens());
 		emailService.sendOrderConfirmationHtmlEmail(obj);
 		return obj;
+	}
+
+	public Page<Pedido> findPage(Integer page, Integer linesPerPage, String orderBy, String direction) {
+		UserSS user = UserService.authenticated();
+		if (user == null) {
+			throw new AuthorizationException("Acesso negado");
+		}
+		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
+		Cliente cliente = clienteService.find(user.getId());
+		return repository.findByCliente(cliente, pageRequest);
 	}
 }
